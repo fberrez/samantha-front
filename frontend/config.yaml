@@ -1,0 +1,6 @@
+- label: "Telegram"
+  isActivated: true
+  token: 624806699:AAGtA4OEfQXcZ533IdDhsGQFMCiuaQiX1_E
+  authorizedUsers:
+    - name: "fberrez"
+      id: 762992265
