@@ -236,7 +236,7 @@ func (f *Frontend) message(capsule *capsule.Capsule) error {
 	return errors.NotFoundf("frontend provider %s", capsule.FrontendProvider)
 }
 
-// stopProviders stop all runing providers.
+// stopProviders stop all running providers.
 func (f *Frontend) stopProviders() {
 	for _, p := range f.activatedProviders {
 		p.Stop()

@@ -100,7 +100,7 @@ listeningLoop:
 			response, err := b.activatedProvider.Message(capsule.Content)
 			if err != nil {
 				if err = b.errorHandler(capsule, err); err != nil {
-					localLogger.WithError(err).Error("Error occured while sending capsule content to the backend provider")
+					localLogger.WithError(err).Error("Error occurred while sending capsule content to the backend provider")
 				}
 				break
 			}
@@ -162,7 +162,7 @@ func loadProvider(providerConfig *provider.Config) (provider.Provider, error) {
 	return p, nil
 }
 
-// errorHandler handles error that can occured on sending message to backend
+// errorHandler handles error that can occurred on sending message to backend
 // providers. It marshal a CapsuleOut and sends it on the backend error channel.
 func (b *Backend) errorHandler(original *capsule.Capsule, err error) error {
 	original.Error = err

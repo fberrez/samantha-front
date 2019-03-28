@@ -43,7 +43,7 @@ type (
 
 	// ResponseWatson is the struct which represents a response given by Watson
 	// to a user input.
-	// It is usefull to parse the string-formatted response to its structured format.
+	// It is useful to parse the string-formatted response to its structured format.
 	ResponseWatson struct {
 		// StatusCode is the status code of the response.
 		StatusCode int `json:"StatusCode"`

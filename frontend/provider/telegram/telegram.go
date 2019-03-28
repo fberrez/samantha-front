@@ -148,7 +148,7 @@ func (t *Telegram) textMessageHandler() func(*tb.Message) {
 
 		// Sends the user input to the frontend manager.
 		if err := t.processUserMessage(message, provider.Text); err != nil {
-			// If an error occured, it generates a system log message and sends it to
+			// If an error occurred, it generates a system log message and sends it to
 			// the user.
 			systemlog := provider.SystemLog(err.Error(), provider.ErrorStatus)
 			t.Bot.Send(message.Sender, systemlog)
@@ -176,7 +176,7 @@ func (t *Telegram) processUserMessage(userMessage *tb.Message, contentType provi
 	// Generates a new version 4 UUID.
 	uuid, err := uuid.NewRandom()
 	if err != nil {
-		return errors.Annotate(err, "proccessing user message")
+		return errors.Annotate(err, "processing user message")
 	}
 
 	// Initializes a message.
