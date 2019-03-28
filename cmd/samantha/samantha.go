@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"github.com/fberrez/samantha/backend"
+	"github.com/fberrez/samantha/capsule"
 	"github.com/fberrez/samantha/frontend"
 	log "github.com/sirupsen/logrus"
 )
@@ -36,26 +37,20 @@ func init() {
 }
 
 func main() {
-	// Initializes channels
-	//
-	// backendErrorChan is the channel handling error on the backend-side.
-	// When an error occured, that is sent to the frontend and, then sent to
-	// the frontend provider.
-	backendErrorChan := make(chan []byte)
-
-	// capsuleChan is the channel making the unidirectional connection between the
+	// Initializes channel.
+	// capsuleChan is the channel making the connection between the
 	// frontend and the backend. When a user input is received on the frontend-side
 	// via a frontend provider, it is sent to the backend to be processed by a NLU
-	// provider.
-	capsuleChan := make(chan []byte)
+	// provider. The backend uses this channel to send the response to the frontend.
+	capsuleChan := make(chan *capsule.Capsule)
 
 	// Initializes frontend manager
-	front, err := frontend.New(backendErrorChan, capsuleChan)
+	front, err := frontend.New(capsuleChan)
 	if err != nil {
 		panic(err)
 	}
 
-	back, err := backend.New(backendErrorChan, capsuleChan)
+	back, err := backend.New(capsuleChan)
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +72,6 @@ func main() {
 	<-quit
 
 	// Closes channel
-	close(backendErrorChan)
 	close(capsuleChan)
 	wg.Wait()
 

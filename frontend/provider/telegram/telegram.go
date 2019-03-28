@@ -1,9 +1,9 @@
 package telegram
 
 import (
-	"strings"
 	"time"
 
+	"github.com/fberrez/samantha/capsule"
 	"github.com/fberrez/samantha/frontend/provider"
 	"github.com/google/uuid"
 	"github.com/juju/errors"
@@ -98,19 +98,12 @@ func (t *Telegram) Start() {
 }
 
 // Message sends the text message to the user.
-func (t *Telegram) Message(respondTo uuid.UUID, messageType provider.ContentType, content []byte) error {
-	switch messageType {
-	case provider.Text:
-		return t.sendTextMessage(respondTo, string(content))
-	case provider.Audio:
-		return errors.NotImplementedf("message type %s", messageType)
-	case provider.Image:
-		return errors.NotImplementedf("message type %s", messageType)
-	case provider.ErrorType:
-		return t.sendTextMessage(respondTo, provider.SystemLog(string(content), provider.ErrorStatus))
-	default:
-		return errors.NotFoundf("input type %s", messageType)
+func (t *Telegram) Message(capsule *capsule.Capsule) error {
+	if capsule.Error != nil && len(capsule.Error.Error()) > 0 {
+		return t.sendErrorMessage(capsule.OriginalMessage, capsule.Error)
 	}
+
+	return t.sendTextMessage(capsule.OriginalMessage, capsule.Responses)
 }
 
 // GetLabel returns the label of the provider
@@ -215,11 +208,10 @@ func (t *Telegram) processUserMessage(userMessage *tb.Message, contentType provi
 // messageToCapsuleProvider converts a given message to a provider.CapsuleProvider
 func messageToCapsuleProvider(msg *message) *provider.CapsuleProvider {
 	return &provider.CapsuleProvider{
-		RespondTo:     msg.uuid,
-		ProviderLabel: label,
-		ContentType:   msg.contentType,
-		Content:       msg.content,
-		User:          msg.user.Username,
+		OriginalMessage: msg.uuid,
+		ProviderLabel:   label,
+		Content:         string(msg.content),
+		User:            msg.user.Username,
 	}
 }
 
@@ -242,17 +234,28 @@ func (t *Telegram) findPendingMessage(uuid uuid.UUID) (*message, error) {
 }
 
 // sendTextMessage responds to a user with a text message.
-func (t *Telegram) sendTextMessage(respondTo uuid.UUID, content string) error {
-	text := string(content)
-	responses := strings.Split(text, provider.Delimiter)
+func (t *Telegram) sendTextMessage(respondTo uuid.UUID, responses []string) error {
 	pendingMessage, err := t.findPendingMessage(respondTo)
 	if err != nil {
 		return err
 	}
 
 	for _, response := range responses {
-		t.Bot.Send(pendingMessage.user, string(response))
+		t.Bot.Send(pendingMessage.user, response)
 	}
 
+	return nil
+}
+
+// sendErrorMessage responds to a user with a system log message containing the
+// error message.
+func (t *Telegram) sendErrorMessage(respondTo uuid.UUID, error error) error {
+	pendingMessage, err := t.findPendingMessage(respondTo)
+	if err != nil {
+		return err
+	}
+
+	systemLogMessage := provider.SystemLog(error.Error(), provider.ErrorStatus)
+	t.Bot.Send(pendingMessage.user, systemLogMessage)
 	return nil
 }

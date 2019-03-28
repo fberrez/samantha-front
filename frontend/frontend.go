@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/fberrez/samantha/capsule"
 	"github.com/fberrez/samantha/frontend/provider"
 	"github.com/fberrez/samantha/frontend/provider/telegram"
 	"github.com/juju/errors"
@@ -25,13 +26,7 @@ type (
 		// the frontend providers.
 		userInput <-chan *provider.CapsuleProvider
 
-		// backendErrorChan is the channel which receives errors that could occured
-		// on the backend side.
-		backendErrorChan <-chan []byte
-
-		// capsuleOutChan is a only-write channel which is used to send capsule containing
-		// all informations about a new user input to the backend.
-		capsuleOutChan chan<- []byte
+		capsule chan *capsule.Capsule
 
 		// wg is local wait group which handles all providers routines.
 		wg *sync.WaitGroup
@@ -75,7 +70,7 @@ var (
 )
 
 // New initiliazes a new frontend providers manager.
-func New(backendErrorChan <-chan []byte, capsuleOutChan chan<- []byte) (*Frontend, error) {
+func New(capsuleChan chan *capsule.Capsule) (*Frontend, error) {
 	// Loads a new structured configuration with the informations of a given
 	// configuration file.
 	providerConfig, err := loadConfig()
@@ -95,8 +90,7 @@ func New(backendErrorChan <-chan []byte, capsuleOutChan chan<- []byte) (*Fronten
 	return &Frontend{
 		activatedProviders: providers,
 		userInput:          userInput,
-		backendErrorChan:   backendErrorChan,
-		capsuleOutChan:     capsuleOutChan,
+		capsule:            capsuleChan,
 		wg:                 &sync.WaitGroup{},
 	}, nil
 }
@@ -130,24 +124,15 @@ listeningLoop:
 				break listeningLoop
 			}
 
-			localLogger.Debugf("Capsule received from %s: %s", capsule.ProviderLabel, string(capsule.Content))
-			if err := f.sendToBackend(capsule); err != nil {
-				// TODO: error handling (send error as syslog to the user)
-
-				localLogger.WithError(err).Error("Error while sending capsule from frontend to backend.")
-			}
-		case data, ok := <-f.backendErrorChan:
+			localLogger.Debugf("Capsule received from %s: %s", capsule.ProviderLabel, capsule.Content)
+			f.sendToBackend(capsule)
+		case capsule, ok := <-f.capsule:
 			if !ok {
 				stop(f)
 				break listeningLoop
 			}
 
-			capsule := provider.CapsuleIn{}
-			if err := yaml.Unmarshal(data, &capsule); err != nil {
-				localLogger.WithError(err).Error("Cannot process error received from backend")
-			}
-
-			if err := f.message(&capsule); err != nil {
+			if err := f.message(capsule); err != nil {
 				localLogger.WithError(err).Error("Cannot process error received from backend")
 			}
 		}
@@ -228,24 +213,27 @@ func loadProvider(providerConfig []*ProviderConfig, userInput chan<- *provider.C
 }
 
 // sendToBackend sends a given capsule to the backend using the capsule out channel.
-func (f *Frontend) sendToBackend(capsule *provider.CapsuleProvider) error {
-	data, err := yaml.Marshal(capsule)
-	if err != nil {
-		return errors.Annotate(err, "sending capsule from frontend to backend")
+func (f *Frontend) sendToBackend(userInput *provider.CapsuleProvider) {
+	capsule := &capsule.Capsule{
+		OriginalMessage:  userInput.OriginalMessage,
+		FrontendProvider: userInput.ProviderLabel,
+		Content:          userInput.Content,
+		User:             userInput.User,
 	}
 
-	f.capsuleOutChan <- data
-	return nil
+	f.capsule <- capsule
 }
 
-func (f *Frontend) message(capsule *provider.CapsuleIn) error {
+// message is used to send message to a user. The given capsule contains all
+// informations needed to send the message to the good provider, the good user...
+func (f *Frontend) message(capsule *capsule.Capsule) error {
 	for _, p := range f.activatedProviders {
-		if capsule.ProviderLabel == p.GetLabel() {
-			return p.Message(capsule.RespondTo, capsule.ContentType, capsule.Content)
+		if capsule.FrontendProvider == p.GetLabel() {
+			return p.Message(capsule)
 		}
 	}
 
-	return errors.NotFoundf("frontend provider %s", capsule.ProviderLabel)
+	return errors.NotFoundf("frontend provider %s", capsule.FrontendProvider)
 }
 
 // stopProviders stop all runing providers.
