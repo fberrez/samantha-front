@@ -1,0 +1,6 @@
+- label: ""
+  isActivated: true
+  token:
+  authorizedUsers:
+    - name: ""
+      id: 

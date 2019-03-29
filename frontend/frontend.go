@@ -150,7 +150,7 @@ func loadConfig() ([]*ProviderConfig, error) {
 		path = defaultConfigFilePath
 	}
 
-	log.WithField("filename", path).Info("Parsing config file")
+	logger.WithField("filename", path).Info("Parsing config file")
 
 	// Reads config file.
 	data, err := ioutil.ReadFile(path)

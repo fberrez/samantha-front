@@ -56,13 +56,13 @@ func New(capsuleChan chan *capsule.Capsule) (*Backend, error) {
 	// configuration file.
 	providerConfig, err := loadConfig()
 	if err != nil {
-		return nil, errors.Annotate(err, "initiliazing frontend")
+		return nil, errors.Annotate(err, "initiliazing backend")
 	}
 
 	// Loads backend providers defined as activated.
 	p, err := loadProvider(providerConfig)
 	if err != nil {
-		return nil, errors.Annotate(err, "initiliazing frontend")
+		return nil, errors.Annotate(err, "initiliazing backend")
 	}
 
 	return &Backend{
@@ -72,7 +72,7 @@ func New(capsuleChan chan *capsule.Capsule) (*Backend, error) {
 	}, nil
 }
 
-// Start starts frontend providers and user inputs listening.
+// Start starts backend providers and user inputs listening.
 func (b *Backend) Start(wg *sync.WaitGroup) {
 	defer wg.Done()
 	localLogger := logger.WithField("action", "listening")
@@ -125,7 +125,7 @@ func loadConfig() (*provider.Config, error) {
 		path = defaultConfigFilePath
 	}
 
-	log.WithField("filename", path).Info("Parsing config file")
+	logger.WithField("filename", path).Info("Parsing config file")
 
 	// Reads config file.
 	data, err := ioutil.ReadFile(path)

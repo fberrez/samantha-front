@@ -2,12 +2,60 @@
 
 
 [[projects]]
+  digest = "1:ed77032e4241e3b8329c9304d66452ed196e795876e14be677a546f36b94e67a"
+  name = "github.com/DataDog/zstd"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c7161f8c63c045cbc7ca051dcc969dd0e4054de2"
+  version = "v1.3.5"
+
+[[projects]]
+  digest = "1:82a18170c9c41e36939cb5d26da1546b2cfa786aa030a978d3bf183519849230"
+  name = "github.com/Shopify/sarama"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "4602b5a8c6e826f9e0737865818dd43b2339a092"
+  version = "v1.21.0"
+
+[[projects]]
   digest = "1:d689318918dac8435731a16f090349f48f3758a3dbe5f967e913185bf264abaf"
   name = "github.com/cloudfoundry-community/go-cfenv"
   packages = ["."]
   pruneopts = "UT"
   revision = "f920e9562d5f951cbf11785728f67258c38a10d0"
   version = "v1.17.0"
+
+[[projects]]
+  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = "UT"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
+
+[[projects]]
+  digest = "1:1f0c7ab489b407a7f8f9ad16c25a504d28ab461517a971d341388a56156c1bd7"
+  name = "github.com/eapache/go-resiliency"
+  packages = ["breaker"]
+  pruneopts = "UT"
+  revision = "ea41b0fad31007accc7f806884dcdf3da98b79ce"
+  version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:79f16588b5576b1b3cd90e48d2374cc9a1a8776862d28d8fd0f23b0e15534967"
+  name = "github.com/eapache/go-xerial-snappy"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "776d5712da21bc4762676d614db1d8a64f4238b0"
+
+[[projects]]
+  digest = "1:444b82bfe35c83bbcaf84e310fb81a1f9ece03edfed586483c869e2c046aef69"
+  name = "github.com/eapache/queue"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "44cc805cf13205b55f69e14bcb69867d1ae92f98"
+  version = "v1.1.0"
 
 [[projects]]
   digest = "1:e1ff887e232b2d8f4f7c7db15a5fac7be418025afc4dda53c59c765dbb5aa6b4"
@@ -27,6 +75,14 @@
   pruneopts = "UT"
   revision = "b32fa301c9fe55953584134cb6853a13c87ec0a1"
   version = "v0.16.0"
+
+[[projects]]
+  digest = "1:e4f5819333ac698d294fe04dbf640f84719658d5c7ce195b10060cc37292ce79"
+  name = "github.com/golang/snappy"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2a8bb927dd31d8daada140a5d09578521ce5c36a"
+  version = "v0.0.1"
 
 [[projects]]
   digest = "1:236d7e1bdb50d8f68559af37dbcf9d142d56b431c9b2176d41e2a009b664cda8"
@@ -69,12 +125,31 @@
   version = "v1.1.2"
 
 [[projects]]
+  digest = "1:d886a3c32c8c1a770d07e36340f061d3afc948d065ffc3c9a19b01b34d4f0b65"
+  name = "github.com/pierrec/lz4"
+  packages = [
+    ".",
+    "internal/xxh32",
+  ]
+  pruneopts = "UT"
+  revision = "315a67e90e415bcdaff33057da191569bf4d8479"
+  version = "v2.1.1"
+
+[[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
   name = "github.com/pkg/errors"
   packages = ["."]
   pruneopts = "UT"
   revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
   version = "v0.8.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:d38f81081a389f1466ec98192cf9115a82158854d6f01e1c23e2e7554b97db71"
+  name = "github.com/rcrowley/go-metrics"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3113b8401b8a98917cde58f8bbd42a1b1c03b1fd"
 
 [[projects]]
   digest = "1:87c2e02fb01c27060ccc5ba7c5a407cc91147726f8f40b70cceeedbc52b1f3a8"
@@ -142,10 +217,12 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/Shopify/sarama",
     "github.com/google/uuid",
     "github.com/juju/errors",
     "github.com/sirupsen/logrus",
     "github.com/watson-developer-cloud/go-sdk/assistantv2",
+    "github.com/watson-developer-cloud/go-sdk/core",
     "gopkg.in/tucnak/telebot.v2",
     "gopkg.in/yaml.v2",
   ]
