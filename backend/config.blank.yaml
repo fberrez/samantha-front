@@ -1,7 +1,7 @@
 # userID is used to identify the client which sends message the NLP provider.
 # It must be a version 4 UUID.
 # Generate a new UUID here: https://www.uuidgenerator.net/version4
-userID:
+userID: 
 
 # IBM Watson credentials.
 label: ""
